@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useSheet } from "@/lib/use-sheet"
+import { useMobile } from "@/lib/use-mobile"
 import { AnimatePresence, motion, useTransform, type MotionValue } from "motion/react"
 import { about, terms } from "@/lib/data"
 import { useSectionProgress } from "@/lib/use-section-progress"
@@ -59,15 +60,18 @@ export function About() {
     return out
   }, [tokens])
 
+  const mobile = useMobile()
   const progress = useSectionProgress(ref, (top, height, vh) => [top - vh, top + height - vh])
   const scale = useTransform(progress, [0, PIN], [0.86, 1])
   const opacity = useTransform(progress, [0, PIN * 0.6], [0, 1])
 
   return (
-    <section id="about" ref={ref} className="relative h-[300vh]">
-      <div className="sticky top-0 flex h-[var(--card-h,100svh)] items-center justify-center overflow-hidden px-5 sm:px-14">
+    <section id="about" ref={ref} className="relative py-20 sm:h-[300vh] sm:py-0">
+      <div className="flex items-center justify-center px-5 sm:sticky sm:top-0 sm:h-[var(--card-h,100svh)] sm:overflow-hidden sm:px-14">
         <motion.div
-          style={{ scale, opacity, ["--p" as string]: progress }}
+          style={
+            mobile ? { ["--p" as string]: 1 } : { scale, opacity, ["--p" as string]: progress }
+          }
           className="mx-auto w-full max-w-6xl space-y-7 text-justify text-[1.2rem] leading-[1.5] font-medium tracking-[-0.02em] [hyphens:auto] [text-align-last:left] sm:text-[1.7rem] lg:text-[2.05rem]"
         >
           {paragraphs.map((para, p) => (
@@ -75,7 +79,11 @@ export function About() {
               {para.map((token, i) => (
                 <span key={i}>
                   {i > 0 && " "}
-                  {token.term ? <Term token={token} progress={progress} /> : <Word token={token} />}
+                  {token.term ? (
+                    <Term token={token} progress={progress} mobile={mobile} />
+                  ) : (
+                    <Word token={token} />
+                  )}
                 </span>
               ))}
             </p>
@@ -90,7 +98,15 @@ function Word({ token }: { token: Token }) {
   return <span style={{ color: read(token.start, token.end, "#f4f4f4") }}>{token.text}</span>
 }
 
-function Term({ token, progress }: { token: Token; progress: MotionValue<number> }) {
+function Term({
+  token,
+  progress,
+  mobile,
+}: {
+  token: Token
+  progress: MotionValue<number>
+  mobile: boolean
+}) {
   const note = terms[token.term!]
   const [hover, setHover] = useState(false)
   const [inSlice, setInSlice] = useState(false)
@@ -99,10 +115,11 @@ function Term({ token, progress }: { token: Token; progress: MotionValue<number>
   const color = read(token.start, lit, "#f4f4f4")
   const underline = read(token.start, lit, "#9a9a9a")
 
-  useEffect(
-    () => progress.on("change", (p) => setInSlice(p >= lit && p < token.end)),
-    [progress, lit, token.end],
-  )
+  useEffect(() => {
+    if (mobile) return
+
+    return progress.on("change", (p) => setInSlice(p >= lit && p < token.end))
+  }, [progress, lit, token.end, mobile])
 
   const open = hover || inSlice
   const anchor = useRef<HTMLSpanElement>(null)
@@ -114,6 +131,7 @@ function Term({ token, progress }: { token: Token; progress: MotionValue<number>
       className="relative"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      onClick={() => mobile && setHover((h) => !h)}
     >
       <span
         style={{ color, textDecorationColor: underline }}

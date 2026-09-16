@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, type ReactNode } from "react"
-import { motion } from "motion/react"
+import { motion, useMotionValue } from "motion/react"
 import { FooterBar } from "@/components/shell/footer-bar"
 import { ScrollProvider } from "@/lib/scroll-context"
 import { Cursor } from "@/components/effects/cursor"
@@ -12,7 +12,8 @@ const FOOTER = 64
 export function Shell({ children }: { children: ReactNode }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [footerOpen, setFooterOpen] = useState(false)
-  const [alwaysOpen, setAlwaysOpen] = useState(false)
+  const [touch, setTouch] = useState(false)
+  const read = useMotionValue(0)
 
   useEffect(() => {
     const el = scrollRef.current
@@ -33,7 +34,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const coarse = window.matchMedia("(hover: none)")
-    const sync = () => setAlwaysOpen(coarse.matches)
+    const sync = () => setTouch(coarse.matches)
 
     sync()
     coarse.addEventListener("change", sync)
@@ -42,7 +43,19 @@ export function Shell({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (alwaysOpen) return
+    const el = scrollRef.current
+    if (!el) return
+
+    const update = () => read.set(el.scrollTop / Math.max(1, el.scrollHeight - el.clientHeight))
+
+    update()
+    el.addEventListener("scroll", update, { passive: true })
+
+    return () => el.removeEventListener("scroll", update)
+  }, [read])
+
+  useEffect(() => {
+    if (touch) return
 
     const onMove = (e: MouseEvent) => setFooterOpen(e.clientY > window.innerHeight - ZONE)
     const onLeave = () => setFooterOpen(false)
@@ -54,9 +67,9 @@ export function Shell({ children }: { children: ReactNode }) {
       window.removeEventListener("mousemove", onMove)
       document.removeEventListener("mouseleave", onLeave)
     }
-  }, [alwaysOpen])
+  }, [touch])
 
-  const open = alwaysOpen || footerOpen
+  const open = !touch && footerOpen
 
   return (
     <ScrollProvider value={scrollRef}>
@@ -72,9 +85,14 @@ export function Shell({ children }: { children: ReactNode }) {
           >
             {children}
           </div>
+          <motion.div
+            aria-hidden
+            style={{ scaleX: read }}
+            className="pointer-events-none absolute inset-x-0 top-0 z-30 h-0.5 origin-left bg-fg/50"
+          />
         </motion.div>
 
-        <FooterBar open={open} height={FOOTER} />
+        {!touch && <FooterBar open={open} height={FOOTER} />}
       </div>
       <Cursor />
     </ScrollProvider>
