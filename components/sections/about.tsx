@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { useSheet } from "@/lib/use-sheet"
+import { Note } from "@/components/ui/note"
+import { AnimatedContent } from "@/components/effects/animated-content"
 import { useMobile } from "@/lib/use-mobile"
-import { AnimatePresence, motion, useTransform, type MotionValue } from "motion/react"
+import { motion, useTransform, type MotionValue } from "motion/react"
 import { about, terms } from "@/lib/data"
 import { useSectionProgress } from "@/lib/use-section-progress"
 import { ToolIcon } from "@/components/ui/tool-icon"
@@ -77,23 +78,37 @@ export function About() {
           className="mx-auto w-full max-w-6xl space-y-7 text-justify text-[1.2rem] leading-[1.5] font-medium tracking-[-0.02em] [hyphens:auto] [text-align-last:left] sm:text-[1.7rem] lg:text-[2.05rem]"
         >
           {paragraphs.map((para, p) => (
-            <p key={p}>
-              {para.map((token, i) => (
-                <span key={i}>
-                  {i > 0 && " "}
-                  {token.term ? (
-                    <Term token={token} progress={progress} mobile={mobile} />
-                  ) : (
-                    <Word token={token} />
-                  )}
-                </span>
-              ))}
-            </p>
+            <Reveal key={p} on={mobile} delay={p * 0.1}>
+              <p>
+                {para.map((token, i) => (
+                  <span key={i}>
+                    {i > 0 && " "}
+                    {token.term ? (
+                      <Term token={token} progress={progress} mobile={mobile} />
+                    ) : (
+                      <Word token={token} />
+                    )}
+                  </span>
+                ))}
+              </p>
+            </Reveal>
           ))}
         </motion.div>
       </div>
     </section>
   )
+}
+
+function Reveal({
+  on,
+  delay,
+  children,
+}: {
+  on: boolean
+  delay: number
+  children: React.ReactNode
+}) {
+  return on ? <AnimatedContent delay={delay}>{children}</AnimatedContent> : children
 }
 
 function Word({ token }: { token: Token }) {
@@ -124,12 +139,9 @@ function Term({
   }, [progress, lit, token.end, mobile])
 
   const open = hover || inSlice
-  const anchor = useRef<HTMLSpanElement>(null)
-  const sheet = useSheet(anchor, open)
 
   return (
     <span
-      ref={anchor}
       className="relative"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -143,40 +155,36 @@ function Term({
       </span>
       <span style={{ color }}>{token.tail}</span>
 
-      <AnimatePresence>
-        {open && note && (
-          <motion.span
-            initial={{ opacity: 0, y: 8, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 6, scale: 0.97 }}
-            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            style={sheet}
-            className="absolute top-full left-1/2 z-30 mt-4 block w-80 -translate-x-1/2 rounded-2xl border border-border-strong bg-panel p-5 text-left text-base font-normal tracking-normal [text-align-last:auto] shadow-[0_30px_50px_-20px_rgba(0,0,0,0.9)]"
-          >
+      {note && (
+        <Note
+          open={open}
+          mobile={mobile}
+          onClose={() => setHover(false)}
+          className="top-full left-1/2 mt-4 w-80 -translate-x-1/2 p-5 text-left text-base font-normal tracking-normal [text-align-last:auto]"
+        >
+          {!mobile && (
             <span
               aria-hidden
-              className="absolute -top-1.5 left-1/2 hidden h-3 w-3 -translate-x-1/2 rotate-45 border-t border-l border-border-strong bg-panel sm:block"
+              className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-t border-l border-border-strong bg-panel"
             />
-            <span className="block text-base font-semibold text-fg">{note.title}</span>
-            <span className="mt-1.5 block text-[0.92rem] leading-[1.6] text-muted">
-              {note.body}
+          )}
+          <span className="block text-base font-semibold text-fg">{note.title}</span>
+          <span className="mt-1.5 block text-[0.92rem] leading-[1.6] text-muted">{note.body}</span>
+          {note.tags.length > 0 && (
+            <span className="mt-4 flex flex-wrap gap-1.5">
+              {note.tags.map((tag) => (
+                <span
+                  key={tag.name}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-xs text-fg"
+                >
+                  {tag.icon && <ToolIcon icon={tag.icon} size={12} />}
+                  {tag.name}
+                </span>
+              ))}
             </span>
-            {note.tags.length > 0 && (
-              <span className="mt-4 flex flex-wrap gap-1.5">
-                {note.tags.map((tag) => (
-                  <span
-                    key={tag.name}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-xs text-fg"
-                  >
-                    {tag.icon && <ToolIcon icon={tag.icon} size={12} />}
-                    {tag.name}
-                  </span>
-                ))}
-              </span>
-            )}
-          </motion.span>
-        )}
-      </AnimatePresence>
+          )}
+        </Note>
+      )}
     </span>
   )
 }

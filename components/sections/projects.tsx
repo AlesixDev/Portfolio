@@ -6,6 +6,7 @@ import { projects, type Project } from "@/lib/data"
 import { SiteShot } from "@/components/ui/site-shot"
 import { useSectionProgress } from "@/lib/use-section-progress"
 import { useMobile } from "@/lib/use-mobile"
+import { AnimatedContent } from "@/components/effects/animated-content"
 
 export function Projects() {
   const ref = useRef<HTMLElement>(null)
@@ -46,8 +47,10 @@ export function Projects() {
             style={mobile ? undefined : { x }}
             className="flex w-max gap-5 px-5 sm:gap-8 sm:px-14 lg:px-20"
           >
-            {projects.map((project) => (
-              <Screen key={project.name} project={project} />
+            {projects.map((project, i) => (
+              <AnimatedContent key={project.name} delay={mobile ? Math.min(i, 2) * 0.1 : 0}>
+                <Screen project={project} />
+              </AnimatedContent>
             ))}
             <div className="w-[8vw] shrink-0" />
           </motion.div>

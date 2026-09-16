@@ -5,6 +5,7 @@ import { motion, useTransform, type MotionValue } from "motion/react"
 import { repos, type Repo } from "@/lib/data"
 import { ToolIcon } from "@/components/ui/tool-icon"
 import { Magnet } from "@/components/effects/magnet"
+import { AnimatedContent } from "@/components/effects/animated-content"
 import { useSectionProgress } from "@/lib/use-section-progress"
 import { useMobile } from "@/lib/use-mobile"
 
@@ -77,21 +78,39 @@ function Card({
   )
   const scale = useTransform(depth, (d) => 1 - d * SHRINK)
 
+  if (mobile) {
+    return (
+      <AnimatedContent delay={Math.min(index, 2) * 0.08}>
+        <Body repo={repo} mobile />
+      </AnimatedContent>
+    )
+  }
+
   return (
     <motion.article
-      style={
+      style={{
+        top: "max(5.5rem, calc((100% - var(--stack-h)) / 2))",
+        y,
+        scale,
+        zIndex: index + 1,
+        transformOrigin: "top center",
+        height: "var(--stack-h)",
+      }}
+      className="absolute inset-x-0 flex flex-col justify-between overflow-hidden rounded-3xl border border-border bg-panel p-10 shadow-[0_-10px_40px_-20px_rgba(0,0,0,0.8)]"
+    >
+      <Body repo={repo} />
+    </motion.article>
+  )
+}
+
+function Body({ repo, mobile = false }: { repo: Repo; mobile?: boolean }) {
+  return (
+    <div
+      className={
         mobile
-          ? undefined
-          : {
-              top: "max(5.5rem, calc((100% - var(--stack-h)) / 2))",
-              y,
-              scale,
-              zIndex: index + 1,
-              transformOrigin: "top center",
-              height: "var(--stack-h)",
-            }
+          ? "relative flex flex-col gap-6 overflow-hidden rounded-3xl border border-border bg-panel p-6"
+          : "contents"
       }
-      className="relative flex flex-col gap-6 overflow-hidden rounded-3xl border border-border bg-panel p-6 sm:absolute sm:inset-x-0 sm:justify-between sm:gap-0 sm:p-10 sm:shadow-[0_-10px_40px_-20px_rgba(0,0,0,0.8)]"
     >
       <ToolIcon
         icon={repo.lang.icon}
@@ -132,6 +151,6 @@ function Card({
         </Magnet>
         {repo.stars > 0 && <span className="text-sm text-muted">★ {repo.stars}</span>}
       </div>
-    </motion.article>
+    </div>
   )
 }
