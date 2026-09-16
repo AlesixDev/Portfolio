@@ -140,12 +140,20 @@ function Term({
 
   const open = hover || inSlice
 
+  if (mobile) {
+    return (
+      <span style={{ color }}>
+        {token.text}
+        {token.tail}
+      </span>
+    )
+  }
+
   return (
     <span
       className="relative"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      onClick={() => mobile && setHover((h) => !h)}
     >
       <span
         style={{ color, textDecorationColor: underline }}
@@ -158,16 +166,14 @@ function Term({
       {note && (
         <Note
           open={open}
-          mobile={mobile}
+          mobile={false}
           onClose={() => setHover(false)}
           className="top-full left-1/2 mt-4 w-80 -translate-x-1/2 p-5 text-left text-base font-normal tracking-normal [text-align-last:auto]"
         >
-          {!mobile && (
-            <span
-              aria-hidden
-              className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-t border-l border-border-strong bg-panel"
-            />
-          )}
+          <span
+            aria-hidden
+            className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-t border-l border-border-strong bg-panel"
+          />
           <span className="block text-base font-semibold text-fg">{note.title}</span>
           <span className="mt-1.5 block text-[0.92rem] leading-[1.6] text-muted">{note.body}</span>
           {note.tags.length > 0 && (
