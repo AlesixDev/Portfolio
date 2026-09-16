@@ -69,9 +69,11 @@ export function About() {
     <section id="about" ref={ref} className="relative py-20 sm:h-[300vh] sm:py-0">
       <div className="flex items-center justify-center px-5 sm:sticky sm:top-0 sm:h-[var(--card-h,100svh)] sm:overflow-hidden sm:px-14">
         <motion.div
-          style={
-            mobile ? { ["--p" as string]: 1 } : { scale, opacity, ["--p" as string]: progress }
-          }
+          style={{
+            scale: mobile ? 1 : scale,
+            opacity: mobile ? 1 : opacity,
+            ["--p" as string]: mobile ? 1 : progress,
+          }}
           className="mx-auto w-full max-w-6xl space-y-7 text-justify text-[1.2rem] leading-[1.5] font-medium tracking-[-0.02em] [hyphens:auto] [text-align-last:left] sm:text-[1.7rem] lg:text-[2.05rem]"
         >
           {paragraphs.map((para, p) => (
