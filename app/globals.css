@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #e6e6e2;
+  --frame-fg: #111111;
+  --frame-muted: #7a7a78;
+  --frame-panel: #d9d9d4;
+
+  --card: #0a0a0a;
+  --panel: #141414;
+  --border: #1f1f1f;
+  --border-strong: #2f2f2f;
+  --fg: #f4f4f4;
+  --muted: #9a9a9a;
+  --faint: #5c5c5c;
+  --dim: #3a3a3a;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-frame-fg: var(--frame-fg);
+  --color-frame-muted: var(--frame-muted);
+  --color-frame-panel: var(--frame-panel);
+  --color-card: var(--card);
+  --color-panel: var(--panel);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-dim: var(--dim);
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--fg);
+  color: var(--card);
+}
+
+.scroll-area {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+.scroll-area::-webkit-scrollbar {
+  width: 7px;
+}
+.scroll-area::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
+.scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.link {
+  color: var(--fg);
+  text-decoration: none;
+  box-shadow: inset 0 -1px 0 0 var(--border-strong);
+  transition: box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.link:hover {
+  box-shadow: inset 0 -2px 0 0 var(--fg);
+}
+
+@keyframes wave {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0deg);
+  }
+  10%,
+  30% {
+    transform: rotate(16deg);
+  }
+  20%,
+  40% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+}
+.wave {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  animation: wave 2.4s ease-in-out infinite;
+}
+
+.outline-text {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--fg);
+  paint-order: stroke fill;
+}
+@media (max-width: 640px) {
+  .outline-text {
+    -webkit-text-stroke-width: 1.5px;
+  }
+}
+
+.link-frame {
+  box-shadow: inset 0 -1px 0 0 transparent;
+  transition:
+    box-shadow 0.3s,
+    color 0.3s;
+}
+.link-frame:hover {
+  box-shadow: inset 0 -1px 0 0 var(--frame-fg);
+}
+
+.no-cursor,
+.no-cursor * {
+  cursor: none !important;
+}
