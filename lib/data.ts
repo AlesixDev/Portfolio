@@ -131,6 +131,15 @@ export type Repo = {
 
 export const repos: Repo[] = [
   {
+    name: "Boreal",
+    description:
+      "Native SSH client and terminal for Windows, drawn on the GPU with Gio. Its own VT emulator and glyph rasterizer, host folders, SFTP with a transfer queue, port forwarding and an encrypted vault.",
+    lang: { name: "Go", icon: "go" },
+    github: "https://github.com/northlighthq/boreal",
+    year: "2026",
+    stars: 16,
+  },
+  {
     name: "MCAIA",
     description:
       "Local AI animator for Minecraft models. A prompt becomes keyframes validated against the rig; imports .bbmodel, glTF and OBJ, exports to Blockbench, Bedrock and GeckoLib.",
