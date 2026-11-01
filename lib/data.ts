@@ -69,9 +69,20 @@ export type Project = {
   url: string
   github: string | null
   year: string
+  image?: string
 }
 
 export const projects: Project[] = [
+  {
+    name: "Boreal",
+    description:
+      "A fast, native SSH client and terminal for Windows. Written in Go and drawn on the GPU with Gio, with its own terminal emulator, host manager, SFTP, tunnels and an encrypted vault.",
+    tech: ["Go", "Gio", "SSH"],
+    url: "https://github.com/northlighthq/boreal",
+    github: "https://github.com/northlighthq/boreal",
+    year: "2026",
+    image: "/projects/boreal.jpg",
+  },
   {
     name: "GitHub Projects",
     description:

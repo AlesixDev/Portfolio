@@ -21,10 +21,12 @@ export function siteShotUrl(url: string, width = 1280, height = 800) {
 export function SiteShot({
   url,
   alt,
+  src,
   className = "",
 }: {
   url: string
   alt: string
+  src?: string
   className?: string
 }) {
   const [loaded, setLoaded] = useState(false)
@@ -42,7 +44,7 @@ export function SiteShot({
       {!failed && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={siteShotUrl(url)}
+          src={src ?? siteShotUrl(url)}
           alt={alt}
           loading="lazy"
           onLoad={() => setLoaded(true)}

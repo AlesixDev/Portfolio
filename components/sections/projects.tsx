@@ -72,6 +72,7 @@ function Screen({ project }: { project: Project }) {
         <SiteShot
           url={project.url}
           alt={`${project.name} screenshot`}
+          src={project.image}
           className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.02]"
         />
       </div>
